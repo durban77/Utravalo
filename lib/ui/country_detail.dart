@@ -9,6 +9,7 @@ import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/ui/flag.dart';
 
 class CountryDetailPage extends StatefulWidget {
+  static const routeName = '/country';
   final String iso3;
 
   const CountryDetailPage({Key key, this.iso3}) : super(key: key);
@@ -38,8 +39,7 @@ class _CountryDetailPageState extends State<CountryDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: //Text("The country"),
-        FutureBuilder<Country>(
+        title: FutureBuilder<Country>(
             future: country,
             builder: (BuildContext context, AsyncSnapshot<Country> snapshot) {
               if (snapshot.hasData) {
@@ -49,6 +49,27 @@ class _CountryDetailPageState extends State<CountryDetailPage> {
               }
             }
         ),
+        actions: [
+          FutureBuilder<Country>(
+            future: country,
+            builder: (BuildContext context, AsyncSnapshot<Country> snapshot) {
+              if (snapshot.hasData && snapshot.data.iso3 != null && snapshot.data.iso3 != '') {
+                return IconButton(
+                  icon: Icon(Icons.account_balance),
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      "/embassiesby",
+                      arguments: snapshot.data.iso3,
+                    );
+                  },
+                );
+              } else {
+                return IconButton(icon: Icon(Icons.account_balance));
+              }
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<Country>(
         future: country,

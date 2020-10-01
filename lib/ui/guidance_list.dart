@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
-import 'package:utravalo/data/util/coder.dart';
 import 'package:utravalo/i18n.dart';
-import 'package:utravalo/ui/flag.dart';
-import 'package:utravalo/ui/security.dart';
+import 'package:utravalo/ui/guess.dart';
 
-class CountryListPage extends StatefulWidget {
-  static const routeName = '/countries';
+class GuidanceListPage extends StatefulWidget {
+  static const routeName = '/guidances';
 
   @override
-  _CountryListPageState createState() => _CountryListPageState();
+  _GuidanceListPageState createState() => _GuidanceListPageState();
 }
 
-class _CountryListPageState extends State<CountryListPage> {
-  Future<List<Country>> countries;
+class _GuidanceListPageState extends State<GuidanceListPage> {
+  Future<List<Guidance>> guidances;
 
   @override
   void initState() {
@@ -25,7 +23,7 @@ class _CountryListPageState extends State<CountryListPage> {
   void fetchList() {
     if (mounted) {
       setState(() {
-        countries = Controller.readCountriesFrom(null);
+        guidances = Controller.readGuidancesFrom(null);
       });
     }
   }
@@ -34,13 +32,13 @@ class _CountryListPageState extends State<CountryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FutureBuilder<List<Country>>(
-            future: countries,
+        title: FutureBuilder<List<Guidance>>(
+            future: guidances,
             builder:
-                (BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
+                (BuildContext context, AsyncSnapshot<List<Guidance>> snapshot) {
               if (snapshot.hasData) {
                 return Text(
-                    AppLocalizations.of(context).translate('countries'));
+                    AppLocalizations.of(context).translate('guidances'));
               } else {
                 return Text('...');
               }
@@ -49,26 +47,24 @@ class _CountryListPageState extends State<CountryListPage> {
       body: RefreshIndicator(
         onRefresh: () async {
           fetchList();
-          await countries;
+          await guidances;
         },
-        child: FutureBuilder<List<Country>>(
-          future: countries,
+        child: FutureBuilder<List<Guidance>>(
+          future: guidances,
           builder:
-              (BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
+              (BuildContext context, AsyncSnapshot<List<Guidance>> snapshot) {
             if (snapshot.hasData) {
               var items = snapshot.data;
               return ListView.builder(
                 itemBuilder: (context, index) {
                   var item = items[index];
-                  return CountryListItem(
-                    iso3: item.iso3,
-                    name: item.countryName,
-                    secure: item.secure,
+                  return GuidanceListItem(
+                    headline: item.headline,
                     onTap: () {
                       Navigator.pushNamed(
                         context,
-                        "/country",
-                        arguments: item.iso3,
+                        "/guidance",
+                        arguments: item.id,
                       );
                     },
                   );
@@ -97,32 +93,21 @@ class _CountryListPageState extends State<CountryListPage> {
   }
 }
 
-class CountryListItem extends StatelessWidget {
-  //final Country country;
-  final String iso3;
-  final String name;
-  final String secure;
+class GuidanceListItem extends StatelessWidget {
+  final String headline;
   final VoidCallback onTap;
 
-  const CountryListItem(
-      {Key key, this.iso3, this.name, this.secure, this.onTap})
+  const GuidanceListItem({Key key, this.headline, this.onTap})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final trio = ColorTrio.fromCode(secure);
     return ListTile(
-      title: Text(name),
-      subtitle: SecurityText(code: secure),
-      leading: CountryFlag(
-        countryCode: iso3,
-        size: 30,
-      ),
-      trailing: SecurityCircle(
-        main: trio.first,
-        secondary: trio.second,
-        tertiary: trio.third,
-        size: 20,
+      title: Text(headline),
+      leading: SizedBox(
+        height: 30,
+        width: 30,
+        child: GuessContent(text: headline),
       ),
       onTap: onTap,
     );

@@ -1,4 +1,10 @@
 {
   "title": "Portmanteau",
-  "countries" : "Countries"
+  "welcome": "Welcome!",
+  "countries" : "Countries",
+  "consulates" : "Consulates",
+  "embassies" : "Consulates",
+  "alerts" : "Alerts",
+  "guidances" : "Guidances",
+  "" : ""
 }

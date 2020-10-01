@@ -1,4 +1,10 @@
 {
   "title": "Útravaló",
-  "countries" : "Országok"
+  "welcome": "Üdvözöllek!",
+  "countries" : "Országok",
+  "consulates" : "Külképviseletek",
+  "embassies" : "Külképviseletek",
+  "alerts" : "Figylemeztetések",
+  "guidances" : "Útmutatók",
+  "" : ""
 }
