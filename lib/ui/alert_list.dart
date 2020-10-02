@@ -4,6 +4,7 @@ import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/i18n.dart';
 import 'package:utravalo/ui/flag.dart';
 import 'package:utravalo/ui/guess.dart';
+import 'package:utravalo/ui/welcome.dart';
 
 class AlertListPage extends StatefulWidget {
   static const routeName = '/alerts';
@@ -32,11 +33,7 @@ class _AlertListPageState extends State<AlertListPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onWillPop: () => willPopHandler(context),
       child: Scaffold(
         appBar: AppBar(
           title: FutureBuilder<List<Alert>>(

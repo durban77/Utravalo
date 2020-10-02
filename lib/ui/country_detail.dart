@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/ui/flag.dart';
+import 'package:utravalo/ui/welcome.dart';
 
 class CountryDetailPage extends StatefulWidget {
   static const routeName = '/country';
@@ -38,11 +39,7 @@ class _CountryDetailPageState extends State<CountryDetailPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onWillPop: () => willPopHandler(context),
       child: Scaffold(
         appBar: AppBar(
           title: FutureBuilder<Country>(

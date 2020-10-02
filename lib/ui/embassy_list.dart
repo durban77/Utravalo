@@ -3,6 +3,7 @@ import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/i18n.dart';
 import 'package:utravalo/ui/flag.dart';
+import 'package:utravalo/ui/welcome.dart';
 
 class EmbassyListPage extends StatefulWidget {
   static const routeName = '/embassies';
@@ -38,11 +39,7 @@ class _EmbassyListPageState extends State<EmbassyListPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onWillPop: () => willPopHandler(context),
       child: Scaffold(
         appBar: AppBar(
           title: FutureBuilder<List<Embassy>>(

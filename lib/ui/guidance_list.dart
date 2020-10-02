@@ -3,6 +3,7 @@ import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/i18n.dart';
 import 'package:utravalo/ui/guess.dart';
+import 'package:utravalo/ui/welcome.dart';
 
 class GuidanceListPage extends StatefulWidget {
   static const routeName = '/guidances';
@@ -31,11 +32,7 @@ class _GuidanceListPageState extends State<GuidanceListPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onWillPop: () => willPopHandler(context),
       child: Scaffold(
         appBar: AppBar(
           title: FutureBuilder<List<Guidance>>(

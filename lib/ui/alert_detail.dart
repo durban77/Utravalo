@@ -5,6 +5,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
+import 'package:utravalo/ui/welcome.dart';
 
 class AlertDetailPage extends StatefulWidget {
   static const routeName = '/alert';
@@ -36,11 +37,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onWillPop: () => willPopHandler(context),
       child: Scaffold(
         appBar: AppBar(
           title: FutureBuilder<Alert>(

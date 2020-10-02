@@ -12,7 +12,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // willpopscope as default
+    return Scaffold(
+      // willpopscope as default
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).translate('title')),
         leading: Icon(Icons.dehaze),
@@ -40,12 +41,18 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/${_pages[index]}.png'),
                   Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(AppLocalizations.of(context)
-                            .translate(_pages[index])),
-                      )),
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Text(
+                          AppLocalizations.of(context).translate(_pages[index]),
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -54,4 +61,13 @@ class WelcomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Közös kód az android vissza gomb kezeléshez
+Future<bool> willPopHandler(BuildContext context) async {
+  if (Navigator.of(context).canPop()) {
+    Navigator.of(context).pop();
+    return false;
+  }
+  return true;
 }

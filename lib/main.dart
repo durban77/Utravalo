@@ -28,6 +28,14 @@ class MyApp extends StatelessWidget {
       //AppLocalizations.of(context)?.translate('title') ?? '',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      builder: (BuildContext context, Widget child) {
+        final MediaQueryData data = MediaQuery.of(context);
+        return MediaQuery(
+          data: data.copyWith(
+              textScaleFactor: data.textScaleFactor > 2.0 ? 2.0 : data.textScaleFactor),
+          child: child,
+        );
+      },
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -50,12 +58,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  get navigatorKey => _navigatorKey;
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
         key: _navigatorKey,
-        //initialRoute: CountryList.routeName,
+        initialRoute: WelcomeScreen.routeName,
         onGenerateRoute: (RouteSettings settings) {
           WidgetBuilder builder;
           switch (settings.name) {
