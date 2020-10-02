@@ -16,8 +16,8 @@ void main() {
   runApp(MyApp());
 }
 
-const int HTTP_DELAYER_SEC = 1;
-const int JSON_DELAYER_SEC = 1;
+const int HTTP_DELAYER_SEC = 0;
+const int JSON_DELAYER_SEC = 0;
 
 class MyApp extends StatelessWidget {
   @override
