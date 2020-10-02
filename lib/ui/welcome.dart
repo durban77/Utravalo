@@ -12,7 +12,7 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold( // willpopscope as default
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).translate('title')),
         leading: Icon(Icons.dehaze),

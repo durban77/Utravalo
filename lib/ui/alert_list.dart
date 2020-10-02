@@ -31,63 +31,71 @@ class _AlertListPageState extends State<AlertListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<List<Alert>>(
+    return WillPopScope(
+      onWillPop: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: FutureBuilder<List<Alert>>(
+              future: alerts,
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<Alert>> snapshot) {
+                if (snapshot.hasData) {
+                  return Text(AppLocalizations.of(context).translate('alerts'));
+                } else {
+                  return Text('...');
+                }
+              }),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            fetchList();
+            await alerts;
+          },
+          child: FutureBuilder<List<Alert>>(
             future: alerts,
             builder:
                 (BuildContext context, AsyncSnapshot<List<Alert>> snapshot) {
               if (snapshot.hasData) {
-                return Text(AppLocalizations.of(context).translate('alerts'));
-              } else {
-                return Text('...');
-              }
-            }),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          fetchList();
-          await alerts;
-        },
-        child: FutureBuilder<List<Alert>>(
-          future: alerts,
-          builder: (BuildContext context, AsyncSnapshot<List<Alert>> snapshot) {
-            if (snapshot.hasData) {
-              var items = snapshot.data;
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  var item = items[index];
-                  return AlertListItem(
-                    headline: item.headline,
-                    timestamp: item.timestamp,
-                    iso3: item.countryIso3,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/alert",
-                        arguments: item.id,
-                      );
-                    },
-                  );
-                },
-                itemCount: items.length,
-              );
-            } else if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: Text("Caught error: ${snapshot.error}"),
+                var items = snapshot.data;
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    var item = items[index];
+                    return AlertListItem(
+                      headline: item.headline,
+                      timestamp: item.timestamp,
+                      iso3: item.countryIso3,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          "/alert",
+                          arguments: item.id,
+                        );
+                      },
+                    );
+                  },
+                  itemCount: items.length,
+                );
+              } else if (snapshot.hasError) {
+                return SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Text("Caught error: ${snapshot.error}"),
+                    ),
                   ),
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );

@@ -32,65 +32,72 @@ class _CountryListPageState extends State<CountryListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<List<Country>>(
+    return WillPopScope(
+      onWillPop: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: FutureBuilder<List<Country>>(
+              future: countries,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Country>> snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                      AppLocalizations.of(context).translate('countries'));
+                } else {
+                  return Text('...');
+                }
+              }),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            fetchList();
+            await countries;
+          },
+          child: FutureBuilder<List<Country>>(
             future: countries,
             builder:
                 (BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
               if (snapshot.hasData) {
-                return Text(
-                    AppLocalizations.of(context).translate('countries'));
-              } else {
-                return Text('...');
-              }
-            }),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          fetchList();
-          await countries;
-        },
-        child: FutureBuilder<List<Country>>(
-          future: countries,
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
-            if (snapshot.hasData) {
-              var items = snapshot.data;
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  var item = items[index];
-                  return CountryListItem(
-                    iso3: item.iso3,
-                    name: item.countryName,
-                    secure: item.secure,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/country",
-                        arguments: item.iso3,
-                      );
-                    },
-                  );
-                },
-                itemCount: items.length,
-              );
-            } else if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: Text("Caught error: ${snapshot.error}"),
+                var items = snapshot.data;
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    var item = items[index];
+                    return CountryListItem(
+                      iso3: item.iso3,
+                      name: item.countryName,
+                      secure: item.secure,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          "/country",
+                          arguments: item.iso3,
+                        );
+                      },
+                    );
+                  },
+                  itemCount: items.length,
+                );
+              } else if (snapshot.hasError) {
+                return SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Text("Caught error: ${snapshot.error}"),
+                    ),
                   ),
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );

@@ -35,89 +35,101 @@ class _EmbassyDetailPageState extends State<EmbassyDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<Embassy>(
-            future: embassy,
-            builder: (BuildContext context, AsyncSnapshot<Embassy> snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data.embassyName);
-              } else {
-                return Text(widget.id);
-              }
-            }),
-        actions: [
-          FutureBuilder<Embassy>(
+    return WillPopScope(
+      onWillPop: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: FutureBuilder<Embassy>(
               future: embassy,
               builder: (BuildContext context, AsyncSnapshot<Embassy> snapshot) {
-                if (snapshot.hasData && snapshot.data.vCard != null && snapshot.data.vCard != '') {
-                  return IconButton(icon: Icon(Icons.contact_phone), onPressed: () {
-                    print(snapshot.data.vCard); // XXX
-                  });
+                if (snapshot.hasData) {
+                  return Text(snapshot.data.embassyName);
                 } else {
-                  return IconButton(icon: Icon(Icons.contact_phone));
+                  return Text(widget.id);
                 }
               }),
-        ],
-      ),
-      body: FutureBuilder<Embassy>(
-        future: embassy,
-        builder: (BuildContext context, AsyncSnapshot<Embassy> snapshot) {
-          if (snapshot.hasData) {
-            var _embassy = snapshot.data;
-            final rawHtmlAsUri = Uri.dataFromString(
-              _embassy.html,
-              mimeType: 'text/html',
-              encoding: Encoding.getByName('utf-8'),
-            ).toString();
-
-            final html = '<h1>${_embassy.embassyName}</h1>' +
-                _embassy.html.replaceAll(RegExp(r"<table.*</table>"), "");
-
-            return SingleChildScrollView(
-              child: Html(
-                data: html,
-                onLinkTap: (url) async {
-                  print("Trying $url");
-                  if (url.startsWith("http")) {
-                    canLaunch(url).then((can) {
-                      if (can) {
-                        print("Opening $url");
-                        launch(
-                          url,
-                          forceSafariVC: false,
-                          forceWebView: false,
-                        );
-                      }
-                    });
+          actions: [
+            FutureBuilder<Embassy>(
+                future: embassy,
+                builder:
+                    (BuildContext context, AsyncSnapshot<Embassy> snapshot) {
+                  if (snapshot.hasData &&
+                      snapshot.data.vCard != null &&
+                      snapshot.data.vCard != '') {
+                    return IconButton(
+                        icon: Icon(Icons.contact_phone),
+                        onPressed: () {
+                          print(snapshot.data.vCard); // XXX
+                        });
                   } else {
-                    print('Could not launch $url');
+                    return IconButton(icon: Icon(Icons.contact_phone));
                   }
-                },
-                onImageTap: (src) {
-                  print(src);
-                },
-                onImageError: (exception, stackTrace) {
-                  print(exception);
-                },
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: Text("Caught error: ${snapshot.error}"),
+                }),
+          ],
+        ),
+        body: FutureBuilder<Embassy>(
+          future: embassy,
+          builder: (BuildContext context, AsyncSnapshot<Embassy> snapshot) {
+            if (snapshot.hasData) {
+              var _embassy = snapshot.data;
+              final rawHtmlAsUri = Uri.dataFromString(
+                _embassy.html,
+                mimeType: 'text/html',
+                encoding: Encoding.getByName('utf-8'),
+              ).toString();
+
+              final html = '<h1>${_embassy.embassyName}</h1>' +
+                  _embassy.html.replaceAll(RegExp(r"<table.*</table>"), "");
+
+              return SingleChildScrollView(
+                child: Html(
+                  data: html,
+                  onLinkTap: (url) async {
+                    print("Trying $url");
+                    if (url.startsWith("http")) {
+                      canLaunch(url).then((can) {
+                        if (can) {
+                          print("Opening $url");
+                          launch(
+                            url,
+                            forceSafariVC: false,
+                            forceWebView: false,
+                          );
+                        }
+                      });
+                    } else {
+                      print('Could not launch $url');
+                    }
+                  },
+                  onImageTap: (src) {
+                    print(src);
+                  },
+                  onImageError: (exception, stackTrace) {
+                    print(exception);
+                  },
                 ),
-              ),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+              );
+            } else if (snapshot.hasError) {
+              return SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                    child: Text("Caught error: ${snapshot.error}"),
+                  ),
+                ),
+              );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
       ),
     );
   }

@@ -30,63 +30,70 @@ class _GuidanceListPageState extends State<GuidanceListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<List<Guidance>>(
+    return WillPopScope(
+      onWillPop: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: FutureBuilder<List<Guidance>>(
+              future: guidances,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Guidance>> snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                      AppLocalizations.of(context).translate('guidances'));
+                } else {
+                  return Text('...');
+                }
+              }),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            fetchList();
+            await guidances;
+          },
+          child: FutureBuilder<List<Guidance>>(
             future: guidances,
             builder:
                 (BuildContext context, AsyncSnapshot<List<Guidance>> snapshot) {
               if (snapshot.hasData) {
-                return Text(
-                    AppLocalizations.of(context).translate('guidances'));
-              } else {
-                return Text('...');
-              }
-            }),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          fetchList();
-          await guidances;
-        },
-        child: FutureBuilder<List<Guidance>>(
-          future: guidances,
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Guidance>> snapshot) {
-            if (snapshot.hasData) {
-              var items = snapshot.data;
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  var item = items[index];
-                  return GuidanceListItem(
-                    headline: item.headline,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/guidance",
-                        arguments: item.id,
-                      );
-                    },
-                  );
-                },
-                itemCount: items.length,
-              );
-            } else if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: Text("Caught error: ${snapshot.error}"),
+                var items = snapshot.data;
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    var item = items[index];
+                    return GuidanceListItem(
+                      headline: item.headline,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          "/guidance",
+                          arguments: item.id,
+                        );
+                      },
+                    );
+                  },
+                  itemCount: items.length,
+                );
+              } else if (snapshot.hasError) {
+                return SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Text("Caught error: ${snapshot.error}"),
+                    ),
                   ),
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );

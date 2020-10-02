@@ -7,6 +7,7 @@ import 'package:utravalo/ui/flag.dart';
 class EmbassyListPage extends StatefulWidget {
   static const routeName = '/embassies';
   final String iso3;
+
   const EmbassyListPage({Key key, this.iso3}) : super(key: key);
 
   @override
@@ -36,64 +37,71 @@ class _EmbassyListPageState extends State<EmbassyListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<List<Embassy>>(
+    return WillPopScope(
+      onWillPop: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: FutureBuilder<List<Embassy>>(
+              future: embassies,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Embassy>> snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                      AppLocalizations.of(context).translate('embassies'));
+                } else {
+                  return Text('...');
+                }
+              }),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            fetchList();
+            await embassies;
+          },
+          child: FutureBuilder<List<Embassy>>(
             future: embassies,
             builder:
                 (BuildContext context, AsyncSnapshot<List<Embassy>> snapshot) {
               if (snapshot.hasData) {
-                return Text(
-                    AppLocalizations.of(context).translate('embassies'));
-              } else {
-                return Text('...');
-              }
-            }),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          fetchList();
-          await embassies;
-        },
-        child: FutureBuilder<List<Embassy>>(
-          future: embassies,
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Embassy>> snapshot) {
-            if (snapshot.hasData) {
-              var items = snapshot.data;
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  var item = items[index];
-                  return EmbassyListItem(
-                    name: item.embassyName,
-                    iso3: item.countryIso3,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/embassy",
-                        arguments: item.id,
-                      );
-                    },
-                  );
-                },
-                itemCount: items.length,
-              );
-            } else if (snapshot.hasError) {
-              return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: Text("Caught error: ${snapshot.error}"),
+                var items = snapshot.data;
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    var item = items[index];
+                    return EmbassyListItem(
+                      name: item.embassyName,
+                      iso3: item.countryIso3,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          "/embassy",
+                          arguments: item.id,
+                        );
+                      },
+                    );
+                  },
+                  itemCount: items.length,
+                );
+              } else if (snapshot.hasError) {
+                return SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Text("Caught error: ${snapshot.error}"),
+                    ),
                   ),
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -110,7 +118,7 @@ class EmbassyListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var iconByName = Icons.add;//account_balance;
+    var iconByName = Icons.add; //account_balance;
     if (name.toLowerCase().contains('tiszteletbeli főkonzul')) {
       iconByName = Icons.store;
     } else if (name.toLowerCase().contains('tiszteletbeli konzul')) {
