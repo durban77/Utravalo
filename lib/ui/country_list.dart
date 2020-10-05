@@ -3,6 +3,7 @@ import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/data/util/coder.dart';
 import 'package:utravalo/i18n.dart';
+import 'package:utravalo/ui/empty.dart';
 import 'package:utravalo/ui/flag.dart';
 import 'package:utravalo/ui/security.dart';
 import 'package:utravalo/ui/welcome.dart';
@@ -60,6 +61,9 @@ class _CountryListPageState extends State<CountryListPage> {
                 (BuildContext context, AsyncSnapshot<List<Country>> snapshot) {
               if (snapshot.hasData) {
                 var items = snapshot.data;
+                if (items.length == 0) {
+                  return EmptyList();
+                }
                 return ListView.builder(
                   itemBuilder: (context, index) {
                     var item = items[index];

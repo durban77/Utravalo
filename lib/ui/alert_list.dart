@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:utravalo/data/daos.dart';
 import 'package:utravalo/data/entities.dart';
 import 'package:utravalo/i18n.dart';
+import 'package:utravalo/ui/empty.dart';
 import 'package:utravalo/ui/flag.dart';
 import 'package:utravalo/ui/guess.dart';
 import 'package:utravalo/ui/welcome.dart';
@@ -58,6 +59,9 @@ class _AlertListPageState extends State<AlertListPage> {
                 (BuildContext context, AsyncSnapshot<List<Alert>> snapshot) {
               if (snapshot.hasData) {
                 var items = snapshot.data;
+                if (items.length == 0) {
+                  return EmptyList();
+                }
                 return ListView.builder(
                   itemBuilder: (context, index) {
                     var item = items[index];

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:utravalo/main.dart';
 
@@ -14,8 +15,24 @@ class Coder {
   /// kezeli a gz -t
   static Future<String> decode(String path, Uint8List raw) async {
     if (path?.endsWith('.gz')) {
-      final decoded = GZ.decode(raw);
-      return UTF8.decode(decoded);
+      if (kIsWeb) {
+        try {
+          final decoded1 = ZLibCodec().decode(raw);
+          return UTF8.decode(decoded1);
+        } catch (error) {
+          print(error);
+          try {
+            final decoded2 = GZipCodec().decode(raw);
+            return UTF8.decode(decoded2);
+          } catch (errorAgain) {
+            print(errorAgain);
+            return "[]";
+          }
+        }
+      } else {
+        final decoded = GZ.decode(raw);
+        return UTF8.decode(decoded);
+      }
     } else {
       // its a raw string
       return UTF8.decode(raw);
